@@ -89,13 +89,19 @@ function Categoria({ set }) {
 function Urgencia({ s, set }) {
   const [reciente, setReciente] = useState(null)
   const esTarjeta = s.categoria === 'tarjeta'
+  // Bug found in the mechanical pass: she said "ya llamé" here, but the plan still showed the report step as pending.
+  function yaHecho() {
+    const id = esTarjeta ? 'c-bloqueo' : 't-reporte'
+    set({ etapa: 'plan', estados: { ...(s.estados || {}), [id]: true } })
+    enviarEstado(s.codigo, s.categoria, id, 'hecho')
+  }
   return (
     <>
       <h1 className="text-xl font-bold">{esTarjeta ? '¿Ya bloqueaste tu tarjeta?' : '¿Hace cuánto hiciste la transferencia?'}</h1>
       {reciente === null && (
         <div className="space-y-2">
           <button className="opcion" onClick={() => setReciente(true)}>{esTarjeta ? 'Todavía no' : 'Hace menos de 1 hora'}</button>
-          <button className="opcion" onClick={() => set({ etapa: 'plan' })}>{esTarjeta ? 'Sí, ya la bloqueé' : 'Hace más de 1 hora'}</button>
+          <button className="opcion" onClick={() => esTarjeta ? yaHecho() : set({ etapa: 'plan' })}>{esTarjeta ? 'Sí, ya la bloqueé' : 'Hace más de 1 hora'}</button>
         </div>
       )}
       {reciente && (
@@ -103,7 +109,7 @@ function Urgencia({ s, set }) {
           <p className="text-lg font-bold">{esTarjeta ? 'Bloquéala ahora, desde la app de tu banco o con el número atrás de tu tarjeta.' : 'Llama YA al número que viene atrás de tu tarjeta.'}</p>
           <p>{esTarjeta ? 'Así no pueden hacer más cargos.' : 'Tu banco es el único que puede intentar detener el dinero, y cada minuto cuenta. Esto no lo hace un bot ni lo hace Respaldo.'}</p>
           <p className="text-sm">Pide un <b>número de folio</b> y anótalo.</p>
-          <button className="boton boton-sec mt-1" onClick={() => set({ etapa: 'plan' })}>{esTarjeta ? 'Ya la bloqueé: ver mi plan' : 'Ya llamé: ver mi plan'}</button>
+          <button className="boton boton-sec mt-1" onClick={yaHecho}>{esTarjeta ? 'Ya la bloqueé: ver mi plan' : 'Ya llamé: ver mi plan'}</button>
         </div>
       )}
     </>
