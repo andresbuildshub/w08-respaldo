@@ -28,7 +28,7 @@ export default function RootLayout({ children }) {
         </header>
         <main className="mx-auto max-w-3xl px-4 py-5">{children}</main>
         <footer className="mx-auto max-w-3xl border-t border-arena px-4 pb-8 pt-4 text-xs text-neutral-600">
-          <p className="mb-2"><Link className="underline" href="/reglas">Qué guardamos de ti</Link> · <Link className="underline" href="/operador">Para el equipo que atiende (personal)</Link></p>
+          <p className="mb-2"><Link className="underline" href="/reglas">Qué guardamos de ti</Link> · <Link className="underline" href="/operador">Solo para empleados que atienden casos</Link></p>
           Proyecto de clase (Crystal Ball Studio, semana 8), no es un servicio oficial ni de ningún banco. La conexión con bancos es SIMULADA.
           Los papeles son modelos, no asesoría legal: confírmalos con la institución. Emergencias: 911 · Denuncia anónima: 089 · CONDUSEF: 55 5340 0999.
         </footer>

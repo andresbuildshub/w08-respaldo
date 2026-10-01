@@ -86,8 +86,8 @@ export default function Documentos() {
       {listo && (
         <div className="space-y-3">
           <div className="no-imprimir flex flex-col gap-2 sm:flex-row">
-            <button className="boton flex-1" onClick={() => window.print()}>Imprimir o guardar como PDF</button>
-            <button className="boton boton-sec flex-1" onClick={() => compartir(texto)}>Guardar en mi teléfono o mandarlo</button>
+            <button className="boton flex-1" onClick={() => compartir(texto)}>Mandarlo por WhatsApp o guardarlo</button>
+            <button className="boton boton-sec flex-1" onClick={() => window.print()}>Imprimir</button>
           </div>
           <p className="no-imprimir text-sm">¿No tienes impresora? Guárdalo en tu teléfono y pide que te lo impriman en una papelería, o enséñalo desde tu teléfono. Las <b>rayitas</b> son para llenarlas a mano si te faltó un dato.</p>
           <pre className="hoja tarjeta whitespace-pre-wrap font-serif text-[15px] leading-relaxed">{texto}</pre>

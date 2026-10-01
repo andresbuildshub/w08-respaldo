@@ -146,7 +146,8 @@ function Plan({ s, set }) {
         <h1 className="text-xl font-bold">Tu plan: {cat.corto}</h1>
         <span className="text-sm text-neutral-600">{hechos} de {cat.pasos.length} pasos hechos</span>
       </div>
-      <p className="tarjeta text-[16px] leading-snug">{cat.verdad}</p>
+      {/* Persona re-test (safety): on the ">1 hour" path she may NOT have called; never tell her the urgent part is done unless she marked it. */}
+      <p className="tarjeta text-[16px] leading-snug">{cat.verdadSinReporte && !estados['t-reporte'] ? cat.verdadSinReporte : cat.verdad}</p>
       <ol className="space-y-3">
         {cat.pasos.map((p, i) => abierto !== p.id ? (
           <li key={p.id}>
