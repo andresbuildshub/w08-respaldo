@@ -1,1 +1,30 @@
 @import "tailwindcss";
+
+@theme {
+  --color-papel: #fffdf8;
+  --color-tinta: #1d1d1f;
+  --color-azul: #173a5e;
+  --color-rojo: #b23a1f;
+  --color-verde: #1d6b3a;
+  --color-arena: #efe9dc;
+}
+
+html, body { background: var(--color-papel); color: var(--color-tinta); }
+.etiqueta { display:inline-block; font-size:11px; font-weight:700; letter-spacing:.02em; padding:2px 7px; border-radius:6px; background:#f6e3a1; color:#5a4500; }
+.tarjeta { background:#fff; border:1px solid #e3dccb; border-radius:14px; padding:14px; }
+.regla { border:2px solid var(--color-rojo); background:#fdeee9; border-radius:14px; padding:12px 14px; }
+.alerta { background:var(--color-rojo); color:#fff; border-radius:14px; padding:14px; }
+.boton { display:inline-flex; align-items:center; justify-content:center; text-align:center; min-height:48px; padding:10px 18px; border-radius:24px; font-weight:600; background:var(--color-azul); color:#fff; }
+.boton-sec { background:#fff; color:var(--color-azul); border:2px solid var(--color-azul); }
+.boton-rojo { background:var(--color-rojo); color:#fff; }
+.opcion { display:block; width:100%; text-align:left; min-height:52px; padding:12px 16px; border-radius:18px; border:2px solid var(--color-azul); color:var(--color-azul); font-weight:600; background:#fff; }
+.opcion:hover { background:#eef3f8; }
+input, textarea, select { border:1.5px solid #cfc6b2; border-radius:10px; padding:10px 12px; width:100%; background:#fff; font-size:16px; }
+label { font-weight:600; font-size:14px; }
+@media print {
+  @page { size: letter; margin: 18mm; }
+  header, footer, .no-imprimir { display:none !important; }
+  body { background:#fff; }
+  main { padding:0 !important; max-width:none !important; }
+  .hoja { white-space:pre-wrap; font-family: "Times New Roman", serif; font-size:12pt; line-height:1.45; break-after: page; border:none !important; padding:0 !important; }
+}
