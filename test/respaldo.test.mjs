@@ -92,3 +92,12 @@ test('documents: filled values appear, blanks otherwise, no crash on empty', () 
   assert.match(generarDocumento('condusef', { categoria: 'tarjeta' }), /CONDUSEF/)
   assert.match(generarDocumento('denuncia', { categoria: 'sat' }), /usurpación de identidad/)
 })
+
+import { armarPrompt, numerosNuevos, simplificarSimulado } from '../lib/redactor.js'
+test('redactor: prompt only from catalog; new-number guard; simulated fallback', () => {
+  assert.equal(armarPrompt('transferencia', 'no-existe'), null)
+  assert.match(armarPrompt('transferencia', 't-clabe'), /Texto original/)
+  assert.deepEqual(numerosNuevos('Llama al 55 5340 0999', 'Llama al 55 5340 0999 hoy'), [])
+  assert.deepEqual(numerosNuevos('Espera 7 días', 'Espera 3 días o llama al 800'), ['3', '800'])
+  assert.match(simplificarSimulado('Entrega tu reclamación a la UNE.'), /oficina de quejas/)
+})
