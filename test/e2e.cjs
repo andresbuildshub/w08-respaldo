@@ -44,14 +44,6 @@ const check = (c, m) => (c ? ok : fallas).push(m)
   const dl = p.waitForEvent('download'); await p.getByRole('button', { name: /recordatorios/ }).click(); const d = await dl
   check(d.suggestedFilename().endsWith('.ics'), '.ics descargado')
 
-  // persona re-test safety fix: >1 hour path must NOT say the bank was already warned
-  const p2 = await ctx.newPage(); await p2.goto(U + '/caso'); await p2.evaluate(() => localStorage.clear())
-  await p2.goto(U); await p2.getByRole('button', { name: /Vengo de mi banco/ }).click(); await p2.waitForURL(/caso/)
-  await p2.getByRole('button', { name: 'No, sigamos' }).click(); await p2.getByRole('button', { name: /Le transferí dinero/ }).click()
-  await p2.getByRole('button', { name: /más de 1 hora/ }).click(); await p2.getByText('Tu plan').waitFor()
-  check(await p2.getByText(/Lo primero, hoy: avisa a tu banco/).isVisible() && await p2.getByText(/Ya hiciste lo más urgente/).count() === 0, 'seguridad: ruta >1h no dice "ya avisaste a tu banco"')
-  await p2.close()
-
   // documentos: privacy under interception
   const inicioDocs = reqs.length
   await p.goto(U + '/documentos?k=transferencia'); await shot('documentos-vacio'); await sinScroll('/documentos')
@@ -71,6 +63,14 @@ const check = (c, m) => (c ? ok : fallas).push(m)
   await p.goto(U + '/operador'); await p.getByText(/códigos de caso distintos/).waitFor(); await shot('operador'); await sinScroll('/operador')
   await p.goto(U + '/operador/redactar'); await shot('redactar'); await sinScroll('/operador/redactar')
   await p.goto(U + '/reglas'); await shot('reglas'); await sinScroll('/reglas')
+  // persona re-test safety fix: >1 hour path must NOT say the bank was already warned
+  const p2 = await ctx.newPage(); await p2.goto(U + '/caso'); await p2.evaluate(() => localStorage.clear())
+  await p2.goto(U); await p2.getByRole('button', { name: /Vengo de mi banco/ }).click(); await p2.waitForURL(/caso/)
+  await p2.getByRole('button', { name: 'No, sigamos' }).click(); await p2.getByRole('button', { name: /Le transferí dinero/ }).click()
+  await p2.getByRole('button', { name: /más de 1 hora/ }).click(); await p2.getByText('Tu plan').waitFor()
+  check(await p2.getByText(/Lo primero, hoy: avisa a tu banco/).isVisible() && await p2.getByText(/Ya hiciste lo más urgente/).count() === 0, 'seguridad: ruta >1h no dice "ya avisaste a tu banco"')
+  await p2.close()
+
   check(consola.filter(c => /Content Security Policy|Refused/.test(c)).length === 0, `sin violaciones CSP en consola (${consola.length} errores totales)`)
   if (consola.length) console.log('CONSOLA:', consola.slice(0, 5))
   console.log('OK', ok.length); ok.forEach(x => console.log('  ✓', x))
