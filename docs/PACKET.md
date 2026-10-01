@@ -136,7 +136,7 @@ See `CHARTER.md`. In short: in three years, the after-fraud coach every bank lin
 | Documents | `lib/documentos.js` → HTML with print CSS | free, no server |
 | Calendar | `lib/ics.js` (RFC 5545) | reminders on HER phone |
 | Persistence | Vercel Blob: one immutable JSON per step state `{codigo, categoria, paso, estado, fecha}` | no personal data → no auth; validated enums |
-| LLM | AI SDK + Vercel AI Gateway (`anthropic/claude-sonnet-4.5` or available); labeled SIMULADO fallback | free tier without access in weeks 5–7 |
+| LLM | AI SDK + Vercel AI Gateway → `google/gemini-2.5-flash-lite` (the class19 free tier returns 403 for Anthropic models; tested 2026-10-01); labeled SIMULADO fallback; guards for added/dropped numbers | free; the human approves |
 | Headers | CSP, `Referrer-Policy: no-referrer`, `X-Frame-Options: DENY`, `Permissions-Policy` | security week: the bar starts at home |
 | Hosting | Vercel (team `class19`) | |
 

@@ -1,6 +1,6 @@
 import { generateText } from 'ai'
 import { CATEGORIAS, paso } from '../../../lib/playbook'
-import { MODELO, SISTEMA, armarPrompt, simplificarSimulado, numerosNuevos } from '../../../lib/redactor'
+import { MODELO, SISTEMA, armarPrompt, simplificarSimulado, numerosNuevos, numerosPerdidos } from '../../../lib/redactor'
 
 export const maxDuration = 60
 const golpes = new Map()
@@ -23,11 +23,14 @@ export async function POST(req) {
   try {
     const { text } = await generateText({ model: MODELO, system: SISTEMA, prompt: armarPrompt(b.categoria, b.pasoId), maxOutputTokens: 300 })
     const borrador = text.trim()
-    return Response.json({ modo: 'real', modelo: MODELO, original, borrador, alertas: numerosNuevos(original, borrador).map(n => `El borrador agrega el número "${n}" que no está en el original: revísalo.`) })
+    return Response.json({ modo: 'real', modelo: MODELO, original, borrador, alertas: [
+      ...numerosNuevos(original, borrador).map(n => `El borrador agrega el número "${n}" que no está en el original.`),
+      ...numerosPerdidos(original, borrador).map(n => `El borrador quitó el número "${n}" que sí está en el original.`),
+    ] })
   } catch (e) {
     const msg = String(e?.message || '') + ' ' + String(e?.responseBody || '')
     console.error('gateway:', e?.name, msg.slice(0, 200))
-    const razon = /customer_verification|credit card|403|forbidden/i.test(msg) ? 'El plan gratuito de AI Gateway del equipo de clase no da acceso a este modelo (403).'
+    const razon = /customer_verification|credit card|403|forbidden|free tier/i.test(msg) ? 'El plan gratuito de AI Gateway del equipo de clase no da acceso a este modelo (403).'
       : /429|rate/i.test(msg) ? 'AI Gateway limitó las solicitudes del plan gratuito (429).'
       : 'No se pudo llamar al modelo.'
     return Response.json({ modo: 'simulado', razon, original, borrador: simplificarSimulado(original), alertas: [] })

@@ -28,3 +28,4 @@ label { font-weight:600; font-size:14px; }
   main { padding:0 !important; max-width:none !important; }
   .hoja { white-space:pre-wrap; font-family: "Times New Roman", serif; font-size:12pt; line-height:1.45; break-after: page; border:none !important; padding:0 !important; }
 }
+.boton:disabled { opacity:.45; cursor:not-allowed; }

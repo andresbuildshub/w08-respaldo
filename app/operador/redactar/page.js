@@ -40,7 +40,8 @@ export default function Redactar() {
             <div className="tarjeta"><p className="text-xs font-bold uppercase">Texto actual</p><p className="mt-1 whitespace-pre-wrap text-[15px]">{r.original}</p></div>
             <div className="tarjeta"><p className="text-xs font-bold uppercase">Borrador</p><p className="mt-1 whitespace-pre-wrap text-[15px]">{r.borrador}</p></div>
           </div>
-          {r.alertas?.length > 0 && <ul className="alerta list-disc pl-8 text-sm">{r.alertas.map(a => <li key={a}>{a}</li>)}</ul>}
+          {r.alertas?.length > 0 && <div className="alerta text-sm"><p className="font-bold">No se puede aprobar así:</p><ul className="list-disc pl-5">{r.alertas.map(a => <li key={a}>{a}</li>)}</ul></div>}
+          <p className="text-sm text-neutral-700">Antes de aprobar, revisa también lo que una regla no ve: ¿cambió el sentido? ¿quitó una advertencia? ¿dice algo que el original no dice?</p>
           {!decision && (
             <div className="grid grid-cols-2 gap-2">
               <button className="boton" onClick={() => setDecision('aprobado')} disabled={r.alertas?.length > 0}>Aprobar para el siguiente despliegue</button>
