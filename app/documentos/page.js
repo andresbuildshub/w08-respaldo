@@ -8,11 +8,17 @@ import { leer, guardar } from '../../lib/local'
 // Everything on this page stays in the browser: no fetch, no form submit. The e2e test checks the network.
 const CAMPOS = {
   base: [['nombre', 'Tu nombre completo', 'text'], ['lugar', 'Ciudad', 'text'], ['hoy', 'Fecha de hoy', 'text']],
-  transferencia: [['fecha', 'Fecha de la transferencia', 'text'], ['hora', 'Hora aproximada', 'text'], ['quien', '¿A nombre de quién te escribieron? (ej. "mi hermano Antonio")', 'text'], ['monto', 'Monto en pesos', 'text'], ['bancoPropio', 'Tu banco', 'text'], ['clabe', 'CLABE a la que transferiste', 'text'], ['rastreo', 'Clave de rastreo (opcional, viene en el comprobante)', 'text'], ['folio', 'Folio que te dio tu banco', 'text']],
-  tarjeta: [['fecha', 'Fecha del cargo', 'text'], ['monto', 'Monto en pesos', 'text'], ['bancoPropio', 'Tu banco', 'text'], ['folio', 'Folio que te dio tu banco', 'text']],
+  transferencia: [['fecha', 'Fecha de la transferencia', 'text'], ['hora', 'Hora aproximada', 'text'], ['quien', '¿A nombre de quién te escribieron? (ej. "mi hermano Antonio")', 'text'], ['monto', 'Monto en pesos', 'text'], ['bancoPropio', 'Tu banco', 'text'], ['clabe', 'CLABE a la que transferiste', 'text'], ['rastreo', 'Clave de rastreo (opcional: viene en tu comprobante de la app)', 'text'], ['folio', 'Folio: el número que te dio tu banco cuando llamaste', 'text']],
+  tarjeta: [['fecha', 'Fecha del cargo', 'text'], ['monto', 'Monto en pesos', 'text'], ['bancoPropio', 'Tu banco', 'text'], ['folio', 'Folio: el número que te dio tu banco cuando llamaste', 'text']],
   sat: [['fecha', 'Fecha en que te diste cuenta', 'text'], ['rfc', 'Tu RFC', 'text']],
   whatsapp: [],
   condusef: [['folioUNE', 'Folio de tu reclamación en el banco', 'text'], ['fechaUNE', 'Fecha en que la entregaste', 'text'], ['respuesta', 'Qué te contestó el banco (si te contestó)', 'text']],
+}
+
+// Persona test: "No tengo impresora. ¿Qué es PDF?" → the phone's own share sheet (WhatsApp to herself, Files, etc.); copy as fallback.
+function compartir(texto) {
+  if (navigator.share) navigator.share({ title: 'Mi papel', text: texto }).catch(() => {})
+  else navigator.clipboard?.writeText(texto)
 }
 
 export default function Documentos() {
@@ -68,6 +74,7 @@ export default function Documentos() {
               <label htmlFor={c}>{etiqueta}</label>
               <input id={c} name={c} autoComplete="off" maxLength={c === 'respuesta' ? 200 : 80} value={f[c] || ''} onChange={e => cambia(c, e.target.value)} />
               {c === 'clabe' && f.bancoDestino && <p className="mt-1 text-sm font-semibold text-verde">Llegó a: {f.bancoDestino}</p>}
+              {c === 'nombre' && <p className="mt-1 text-xs text-neutral-600">Tu nombre se queda en este teléfono: lo necesitas en tu papel, nosotros no.</p>}
             </div>
           ))}
           <p className="text-xs text-neutral-600">Lo que dejes en blanco sale con una línea para llenarlo a mano.</p>
@@ -80,8 +87,9 @@ export default function Documentos() {
         <div className="space-y-3">
           <div className="no-imprimir flex flex-col gap-2 sm:flex-row">
             <button className="boton flex-1" onClick={() => window.print()}>Imprimir o guardar como PDF</button>
-            <button className="boton boton-sec flex-1" onClick={() => navigator.clipboard?.writeText(texto)}>Copiar el texto</button>
+            <button className="boton boton-sec flex-1" onClick={() => compartir(texto)}>Guardar en mi teléfono o mandarlo</button>
           </div>
+          <p className="no-imprimir text-sm">¿No tienes impresora? Guárdalo en tu teléfono y pide que te lo impriman en una papelería, o enséñalo desde tu teléfono. Las <b>rayitas</b> son para llenarlas a mano si te faltó un dato.</p>
           <pre className="hoja tarjeta whitespace-pre-wrap font-serif text-[15px] leading-relaxed">{texto}</pre>
           {tipo === 'condusef' && <p className="no-imprimir text-sm">Pégalo en el <a className="underline" href="https://www.condusef.gob.mx/?p=contenido&idc=1338&idcat=1" target="_blank" rel="noreferrer">Portal de Queja Electrónica</a> o léelo por teléfono al <a className="underline" href="tel:5553400999">55 5340 0999</a>.</p>}
         </div>

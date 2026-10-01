@@ -6,12 +6,12 @@ export const metadata = {
   description: 'Qué hacer después de un fraude, paso por paso, sin darnos tus datos. México.',
 }
 
+// Persona test (Doña Lety): "Operador" in this menu read as "a person who'll help me" and led her to the staff
+// dashboard, where she quit. Staff pages now live only behind the footer link.
 const NAV = [
   ['/caso', 'Mi caso'],
   ['/documentos', 'Mis papeles'],
-  ['/es-real', '¿Es real?'],
-  ['/operador', 'Operador'],
-  ['/reglas', 'Qué guardamos'],
+  ['/es-real', '¿Me escribió Respaldo?'],
 ]
 
 export default function RootLayout({ children }) {
@@ -28,6 +28,7 @@ export default function RootLayout({ children }) {
         </header>
         <main className="mx-auto max-w-3xl px-4 py-5">{children}</main>
         <footer className="mx-auto max-w-3xl border-t border-arena px-4 pb-8 pt-4 text-xs text-neutral-600">
+          <p className="mb-2"><Link className="underline" href="/reglas">Qué guardamos de ti</Link> · <Link className="underline" href="/operador">Para el equipo que atiende (personal)</Link></p>
           Proyecto de clase (Crystal Ball Studio, semana 8), no es un servicio oficial ni de ningún banco. La conexión con bancos es SIMULADA.
           Los papeles son modelos, no asesoría legal: confírmalos con la institución. Emergencias: 911 · Denuncia anónima: 089 · CONDUSEF: 55 5340 0999.
         </footer>

@@ -79,7 +79,9 @@ function Categoria({ set }) {
       <p className="text-sm text-neutral-700">Escoge la que más se parezca. Puedes cambiarla después.</p>
       <div className="space-y-2">
         {Object.entries(CATEGORIAS).map(([k, c]) => (
-          <button key={k} className="opcion" onClick={() => set({ categoria: k, etapa: (k === 'transferencia' || k === 'tarjeta') ? 'urgencia' : 'plan' })}>{c.titulo}</button>
+          <button key={k} className="opcion" onClick={() => set({ categoria: k, etapa: (k === 'transferencia' || k === 'tarjeta') ? 'urgencia' : 'plan' })}>
+            {c.titulo}{c.ayuda && <span className="mt-1 block text-sm font-normal text-neutral-700">{c.ayuda}</span>}
+          </button>
         ))}
       </div>
     </>
@@ -92,7 +94,7 @@ function Urgencia({ s, set }) {
   // Bug found in the mechanical pass: she said "ya llamé" here, but the plan still showed the report step as pending.
   function yaHecho() {
     const id = esTarjeta ? 'c-bloqueo' : 't-reporte'
-    set({ etapa: 'plan', estados: { ...(s.estados || {}), [id]: true } })
+    set({ etapa: 'plan', estados: { ...(s.estados || {}), [id]: true }, porCompuerta: id })
     enviarEstado(s.codigo, s.categoria, id, 'hecho')
   }
   return (
@@ -120,6 +122,10 @@ function Plan({ s, set }) {
   const cat = CATEGORIAS[s.categoria]
   const estados = s.estados || {}
   const hechos = cat.pasos.filter(p => estados[p.id]).length
+  // Persona test: "Es muy largo, ¿qué hago primero?" → only the next undone step is open; the rest show their title.
+  const siguiente = cat.pasos.find(p => !estados[p.id])?.id
+  const [abierto, setAbierto] = useState(siguiente)
+  useEffect(() => { setAbierto(siguiente) }, [siguiente])
 
   function marcar(id) {
     const nuevo = !estados[id]
@@ -138,15 +144,23 @@ function Plan({ s, set }) {
       <Regla compacta />
       <div className="flex items-baseline justify-between gap-2">
         <h1 className="text-xl font-bold">Tu plan: {cat.corto}</h1>
-        <span className="text-sm text-neutral-600">{hechos} de {cat.pasos.length}</span>
+        <span className="text-sm text-neutral-600">{hechos} de {cat.pasos.length} pasos hechos</span>
       </div>
-      <p className="tarjeta text-[15px] leading-snug">{cat.verdad}</p>
+      <p className="tarjeta text-[16px] leading-snug">{cat.verdad}</p>
       <ol className="space-y-3">
-        {cat.pasos.map(p => (
-          <li key={p.id} className={`tarjeta ${estados[p.id] ? 'opacity-70' : ''}`}>
-            <p className="text-xs font-bold uppercase tracking-wide text-azul">{p.dia}</p>
-            <p className="font-semibold leading-snug">{p.titulo}</p>
-            <p className="mt-1 text-[15px] leading-snug">{p.porque}</p>
+        {cat.pasos.map((p, i) => abierto !== p.id ? (
+          <li key={p.id}>
+            <button className={`tarjeta flex w-full items-center justify-between gap-2 text-left ${estados[p.id] ? 'opacity-70' : ''}`} onClick={() => setAbierto(p.id)}>
+              <span><span className="block text-xs font-bold uppercase tracking-wide text-azul">Paso {i + 1} · {p.dia}</span><span className="font-semibold leading-snug">{p.titulo}</span></span>
+              <span className="shrink-0 text-sm">{estados[p.id] ? '✓ Hecho' : 'Ver'}</span>
+            </button>
+          </li>
+        ) : (
+          <li key={p.id} className="tarjeta border-2 border-azul">
+            <p className="text-xs font-bold uppercase tracking-wide text-azul">Paso {i + 1} · {p.dia}</p>
+            <p className="text-lg font-semibold leading-snug">{p.titulo}</p>
+            <p className="mt-1 text-[16px] leading-snug">{p.porque}</p>
+            {s.porCompuerta === p.id && estados[p.id] && <p className="mt-1 text-sm text-verde">Lo marcamos como hecho porque nos dijiste que ya lo hiciste.</p>}
             {p.herramienta === 'clabe' && <RevisarCLABE s={s} set={set} />}
             {p.herramienta === 'documentos' && <Link className="boton boton-sec mt-2 w-full" href={`/documentos?k=${s.categoria}`}>Preparar mis papeles</Link>}
             {p.herramienta === 'condusef' && <Link className="boton boton-sec mt-2 w-full" href={`/documentos?k=${s.categoria}&doc=condusef`}>Armar mi queja para CONDUSEF</Link>}
@@ -158,6 +172,7 @@ function Plan({ s, set }) {
           </li>
         ))}
       </ol>
+      {cat.letraChica && <p className="text-sm text-neutral-700">{cat.letraChica}</p>}
       <div className="tarjeta space-y-2">
         <p className="font-semibold">Recordatorios en tu calendario</p>
         <p className="text-sm">Respaldo no te va a escribir. Si quieres que te recuerden el día 7 y el día 30, guárdalos en <b>tu</b> calendario: el aviso sale de tu teléfono, no de nosotros.</p>
@@ -180,6 +195,7 @@ function RevisarCLABE({ s, set }) {
       <input id="clabe" inputMode="numeric" autoComplete="off" maxLength={24} value={txt} placeholder="Está en tu comprobante"
         onChange={e => { const v = e.target.value.replace(/[^\d\s]/g, ''); setTxt(v); const rr = v.replace(/\D/g, '').length === 18 ? revisarCLABE(v) : null; set({ clabe: v, bancoDestino: rr?.ok ? rr.banco : '' }) }} />
       {r && <p className={`mt-2 font-semibold ${r.ok ? 'text-verde' : 'text-rojo'}`}>{r.mensaje}</p>}
+      {r?.ok && <p className="mt-1 text-[15px]">{r.simple} <b>Anota este nombre:</b> va en tu reclamación y en tu denuncia. Ya lo pusimos en tus papeles.</p>}
       <p className="mt-1 text-xs text-neutral-600">Se revisa en tu teléfono con el dígito verificador de la CLABE. No se envía a ningún lado.</p>
     </div>
   )
